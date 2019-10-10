@@ -29,12 +29,14 @@ class Fibank
 
   def collect_accounts
     html = fetch_accounts
+
     parse_accounts(html)
   end
 
   def collect_transactions
     @accounts.each do |account|
       html = fetch_transactions(account)
+
       parse_transactions(account, html)
     end
   end
@@ -45,7 +47,9 @@ class Fibank
 
   def fetch_transactions(account)
     go_home
+
     sleep 2
+
     select_account(account)
 
     Nokogiri.parse(@browser.html)
@@ -55,7 +59,9 @@ class Fibank
     html.each do |tr|
       name = tr.xpath('.//p[@bo-bind="row.acDesc"]').text
       currency = tr.xpath('.//span[@bo-bind="row.ccy"]').text
-      balance = tr.xpath('.//span[@bo-bind="row.acyAvlBal | sgCurrency"]').text.gsub(' ', '').to_f
+      balance = tr.xpath('.//span[@bo-bind="row.acyAvlBal | sgCurrency"]') \
+                  .text.gsub(' ', '').to_f
+
       @accounts << Account.new(name, currency, balance)
     end
   end
@@ -64,9 +70,11 @@ class Fibank
     html.css('table#accountStatements tbody tr').each do |tr|
       date = tr.xpath('.//span[@bo-bind="row.dateTime | sgDate"]').text
       description = tr.xpath('.//*[@bo-bind="row.trname"]').text
-      amount = to_amount(tr.xpath('.//span[@bo-bind="row.drAmount | sgCurrency"]').text)
+      amount = to_amount \
+               (tr.xpath('.//span[@bo-bind="row.drAmount | sgCurrency"]').text)
       if amount == 0.0
-        amount = to_amount(tr.xpath('.//span[@bo-bind="row.crAmount | sgCurrency"]').text)
+        amount = to_amount \
+               (tr.xpath('.//span[@bo-bind="row.crAmount | sgCurrency"]').text)
       else
         amount *= -1
       end
@@ -82,13 +90,17 @@ class Fibank
   end
 
   def select_account(account)
-    @browser.table(id: 'dashboardAccounts').tbody.p('bo-bind' => 'row.acDesc', text: account.name).following_sibling(tag_name: 'a').click
+    @browser.table(id: 'dashboardAccounts').tbody \
+            .p('bo-bind' => 'row.acDesc', text: account.name) \
+            .following_sibling(tag_name: 'a').click
     sleep 2
     @browser.a(translate: 'PAGES.ACCOUNTS_TAB.STATEMENT').click
     sleep 1
     @browser.div('prop-name' => 'Iban').span(class: 'filter-option').click
-    @browser.div('prop-name' => 'Iban').span(text: /#{Regexp.escape(account.name)}/).click
-    @browser.div('prop-name' => 'FromDate').text_field.set((Date.today - 60).strftime('%d/%m/%Y'))
+    @browser.div('prop-name' => 'Iban') \
+            .span(text: /#{Regexp.escape(account.name)}/).click
+    @browser.div('prop-name' => 'FromDate') \
+            .text_field.set((Date.today - 60).strftime('%d/%m/%Y'))
     @browser.button(id: 'button').click
     sleep 2
   end
