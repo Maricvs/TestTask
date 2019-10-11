@@ -7,4 +7,12 @@ class Transaction
     @amount = amount
     @account = account
   end
+
+  def to_hash_trans
+    {
+      "date":        @date,
+      "description": @description,
+      "amount":      @amount
+    }
+  end
 end

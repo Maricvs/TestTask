@@ -7,4 +7,12 @@ class Account
     @balance = balance
     @transactions = []
   end
+
+  def to_hash_acc
+    {
+      "name":     @name,
+      "currency": @currency,
+      "balance":  @balance,
+    }
+  end
 end
