@@ -8,7 +8,7 @@ class Account
     @transactions = []
   end
 
-  def to_hash_acc
+  def to_hash
     {
       "name":     @name,
       "currency": @currency,

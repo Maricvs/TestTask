@@ -9,18 +9,21 @@ class Fibank
   MAIN_URL = 'https://my.fibank.bg/oauth2-server/login?client_id=E_BANK'
 
   def initialize
-    @browser = Watir::Browser.start(MAIN_URL)
     @accounts = []
   end
 
   def execute
+    # 18 string moved from the method initialize
+    # so that the browser does not open when testing
+    @browser = Watir::Browser.start(MAIN_URL)
     connect
     collect_accounts
     collect_transactions
     print_result
   end
 
-  private
+  # does not give access to the method for tests
+  # private
 
   def connect
     @browser.link(id: 'demo-link').click
@@ -40,7 +43,7 @@ class Fibank
   end
 
   def fetch_accounts
-    Nokogiri.parse(@browser.html).css('table#dashboardAccounts tbody tr')
+    Nokogiri.parse(@browser.html)
   end
 
   def fetch_transactions(account)
@@ -51,7 +54,7 @@ class Fibank
   end
 
   def parse_accounts(html)
-    html.each do |tr|
+    html.css('table#dashboardAccounts tbody tr').each do |tr|
       name = tr.css('p[bo-bind="row.acDesc"]').text
       currency = tr.css('span[@bo-bind="row.ccy"]').text
       balance = to_amount(tr.css('span[@bo-bind="row.acyAvlBal | sgCurrency"]').text)
@@ -82,7 +85,6 @@ class Fibank
   end
 
   def select_account(account)
-    #@browser.table(id: 'dashboardAccounts').tbody.p(text: account.name).link.click
     @browser.table(id: 'dashboardAccounts').span('bo-bind' => 'row.iban').click
     sleep 2
     @browser.a(translate: 'PAGES.ACCOUNTS_TAB.STATEMENT').click
@@ -100,11 +102,11 @@ class Fibank
 
   def print_result
     @accounts.each do |account|
-      puts "Accounts: #{account.to_hash_acc}"
+      puts "Accounts: #{account.to_hash}"
       if account.transactions.count > 0
         puts "Transactions in the last two months:"
         account.transactions.each do |transaction|
-          puts transaction.to_hash_trans
+          puts transaction.to_hash
         end
       else
         puts "No transactions"
@@ -114,4 +116,5 @@ class Fibank
   end
 end
 
-Fibank.new.execute
+# running code in Fibank_execution.rb
+# Fibank.new.execute

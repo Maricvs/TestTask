@@ -8,7 +8,7 @@ class Transaction
     @account = account
   end
 
-  def to_hash_trans
+  def to_hash
     {
       "date":        @date,
       "description": @description,
