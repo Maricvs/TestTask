@@ -61,6 +61,7 @@ class Fibank
 
       @accounts << Account.new(name, currency, balance)
     end
+  @accounts
   end
 
   def parse_transactions(account, html)
