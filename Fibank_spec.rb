@@ -7,16 +7,16 @@ describe Fibank do
   let(:account) { Fibank.new.parse_accounts(html) }
   let(:html) { Nokogiri::HTML(File.open("accounts.html")) }
 
-    it 'returns Accounts count' do
-      expect(account.count).to eq(2)
-    end
+  it 'returns Accounts count' do
+    expect(account.count).to eq(2)
+  end
 
-    it 'parse Accounts data example' do
-      expect(account[0].to_hash).to eq({
-        :name =>      "fibank EUR",
-        :currency =>  "EUR",
-        :balance =>   0.0
-      })
+  it 'parse Accounts data example' do
+    expect(account[0].to_hash).to eq({
+      :name =>      "fibank EUR",
+      :currency =>  "EUR",
+      :balance =>   0.0
+    })
     end
   end
 
